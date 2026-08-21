@@ -23,7 +23,7 @@ class Application(Base):
     job_id: Mapped[int] = mapped_column(ForeignKey("jobs.id"), nullable=False)
     resume_id: Mapped[int | None] = mapped_column(ForeignKey("resumes.id"), nullable=True)
 
-    current_status: Mapped[str] = mapped_column(String, nullable=False, default="saved")
+    current_status: Mapped[str] = mapped_column(String, nullable=False, default="Saved")
     date_applied: Mapped[date | None] = mapped_column(Date, nullable=True)
     recruiter_contact: Mapped[str | None] = mapped_column(String, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -33,6 +33,7 @@ class Application(Base):
     )
 
     user: Mapped["User"] = relationship(back_populates="applications")  # noqa: F821
+    job: Mapped["Job"] = relationship()  # noqa: F821
     resume: Mapped["Resume | None"] = relationship(back_populates="applications")  # noqa: F821
     events: Mapped[list["ApplicationEvent"]] = relationship(  # noqa: F821
         back_populates="application", order_by="ApplicationEvent.event_date"
