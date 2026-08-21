@@ -13,6 +13,7 @@ class Job(Base):
 
     company_id: Mapped[int] = mapped_column(ForeignKey("companies.id"), nullable=False)
     source_id: Mapped[int | None] = mapped_column(ForeignKey("job_sources.id"), nullable=True)
+    raw_posting_id: Mapped[int | None] = mapped_column(ForeignKey("raw_postings.id"), nullable=True)
 
     title: Mapped[str] = mapped_column(String, nullable=False)
     category: Mapped[str | None] = mapped_column(String, nullable=True)  # SWE, Data Eng, ML/AI, etc.

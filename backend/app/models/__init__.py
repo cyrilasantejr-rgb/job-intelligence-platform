@@ -18,6 +18,7 @@ from app.models.job import Job
 from app.models.job_match import JobMatch
 from app.models.job_skill import JobSkill, UserSkill
 from app.models.job_source import JobSource
+from app.models.raw_posting import RawPosting
 from app.models.resume import Resume
 from app.models.skill import Skill
 from app.models.user import User
@@ -33,6 +34,7 @@ __all__ = [
     "JobMatch",
     "JobSkill",
     "JobSource",
+    "RawPosting",
     "Resume",
     "Skill",
     "User",
