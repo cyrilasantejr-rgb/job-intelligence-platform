@@ -42,21 +42,31 @@ EMPLOYMENT_TYPE_KEYWORDS: dict[str, list[str]] = {
     "New Grad": ["new grad", "new graduate", "university grad", "entry level", "early career"],
 }
 
+SENIOR_KEYWORDS = [
+    "senior",
+    "sr.",
+    "sr",
+    "staff",
+    "principal",
+    "distinguished",
+    "lead",
+    "director",
+    "vp",
+    "vice president",
+    "head of",
+    "chief",
+    "executive",
+    "president",
+    "manager",
+    "architect",
+]
+
 
 def _matches_any(text: str, keywords: list[str]) -> bool:
     return any(keyword in text for keyword in keywords)
 
 
 def infer_category(title: str, description: str | None = None) -> str | None:
-    """
-    Returns the first matching category, checked in CATEGORY_KEYWORDS order.
-
-    Order matters: e.g. a title like "Machine Learning Data Engineer" would
-    match both ML and Data Engineering keywords — we check ML first since
-    the earlier categories in the dict are checked first. This is a
-    reasonable default judgment call, not a hard rule; revisit if seed data
-    shows it's picking the wrong category often.
-    """
     text = f"{title} {description or ''}".lower()
     text = re.sub(r"\s+", " ", text)
 
@@ -72,3 +82,24 @@ def infer_employment_type(title: str) -> str | None:
         if _matches_any(text, keywords):
             return employment_type
     return None
+
+
+def is_senior_role(title: str) -> bool:
+    """True if the title contains a word-boundary match for a senior-level
+    keyword (Senior, Staff, Director, Manager, etc.)."""
+    text = title.lower()
+    return any(re.search(rf"\b{re.escape(kw)}\b", text) for kw in SENIOR_KEYWORDS)
+
+
+def is_entry_level_friendly(title: str) -> bool:
+    """
+    True if the role looks appropriate for an internship/new-grad job
+    seeker — either explicitly labeled as such, or simply not flagged as
+    senior-level. This is deliberately permissive: a title with no
+    seniority signal at all (e.g. plain "Software Engineer") is treated
+    as beginner-friendly rather than excluded, since many companies don't
+    label entry-level roles explicitly.
+    """
+    if infer_employment_type(title) is not None:
+        return True
+    return not is_senior_role(title)

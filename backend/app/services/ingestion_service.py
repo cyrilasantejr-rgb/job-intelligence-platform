@@ -19,7 +19,7 @@ from app.core.logging import get_logger
 from app.models.raw_posting import RawPosting
 from app.schemas.job import JobCreate
 from app.services import job_service
-from app.services.categorization import infer_category, infer_employment_type
+from app.services.categorization import infer_category, infer_employment_type, is_entry_level_friendly
 
 logger = get_logger(__name__)
 
@@ -93,6 +93,15 @@ def process_raw_posting(db: Session, raw_posting: RawPosting, company_name: str)
         job_in = transform_greenhouse_job(raw_posting.raw_payload, company_name)
         if not job_in.title:
             logger.warning("Raw posting %d has no title — skipping.", raw_posting.id)
+            raw_posting.processed = True
+            return False
+
+        if job_in.category is None or not is_entry_level_friendly(job_in.title):
+            logger.info(
+                "Raw posting %d skipped (not entry-level target role): '%s'",
+                raw_posting.id,
+                job_in.title,
+            )
             raw_posting.processed = True
             return False
 
